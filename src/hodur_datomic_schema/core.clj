@@ -66,9 +66,11 @@
                m field)))
 
 (defn ^:private process-field
-  [entity-id is-enum? {:keys [field/name] :as field}]
+  [entity-id is-enum? {:keys [field/name datomic/separator] :as field}]
   (cond-> {:db/ident (keyword entity-id
-                              (->kebab-case-string name))}
+                              (if separator
+                                (->kebab-case-string name :separator separator)
+                                (->kebab-case-string name)))}
     (not is-enum?) (assoc :db/valueType (get-value-type field)
                           :db/cardinality (get-cardinality field))
     (not is-enum?) (assoc-attributes field)
